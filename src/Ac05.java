@@ -34,6 +34,7 @@ public class Ac05
 			int[] instruction = instructionToParts(value);
 
 			int op = instruction[3] * 10 + instruction[4];
+			int delta;
 			switch (op)
 			{
 				case 99:
@@ -55,10 +56,18 @@ public class Ac05
 					increment = 2;
 					break;
 				case 5:
-					i = jumpIfTrue(instruction, values, i);
+					delta = jumpIfTrue(instruction, values, i);
+					if (delta == 0)
+						increment = 3;
+					else
+						i = delta;
 					break;
 				case 6:
-					i = jumpIfFalse(instruction, values, i);
+					delta = jumpIfFalse(instruction, values, i);
+					if (delta == 0)
+						increment = 3;
+					else
+						i = delta;
 					break;
 				case 7:
 					lessThan(instruction, values, i);
@@ -80,13 +89,12 @@ public class Ac05
 	{
 		int first = instruction[2];
 		int second = instruction[1];
-		int third = instruction[0];
 
 		int left = first == 0 ? input[index + 1] : index + 1;
 		int right = second == 0 ? input[index + 2] : index + 2;
 		int target = input[index + 3];
 
-		if (left < right)
+		if (input[left] < input[right])
 			input[target] = 1;
 		else
 			input[target] = 0;
@@ -96,13 +104,12 @@ public class Ac05
 	{
 		int first = instruction[2];
 		int second = instruction[1];
-		int third = instruction[0];
 
 		int left = first == 0 ? input[index + 1] : index + 1;
 		int right = second == 0 ? input[index + 2] : index + 2;
 		int target = input[index + 3];
 
-		if (left == right)
+		if (input[left].equals(input[right]))
 			input[target] = 1;
 		else
 			input[target] = 0;
@@ -112,39 +119,34 @@ public class Ac05
 	{
 		int first = instruction[2];
 		int second = instruction[1];
-		int third = instruction[0];
 
 		int left = first == 0 ? input[index + 1] : index + 1;
 		int right = second == 0 ? input[index + 2] : index + 2;
-		int target = input[index + 3];
 
-		if (left != 0)
-			return right;
+		if (input[left] != 0)
+			return input[right];
 		else
-			return index;
+			return 0;
 	}
 
 	private static int jumpIfFalse(int[] instruction, Integer[] input, int index)
 	{
 		int first = instruction[2];
 		int second = instruction[1];
-		int third = instruction[0];
 
 		int left = first == 0 ? input[index + 1] : index + 1;
 		int right = second == 0 ? input[index + 2] : index + 2;
-		int target = input[index + 3];
 
-		if (left == 0)
-			return right;
+		if (input[left] == 0)
+			return input[right];
 		else
-			return index;
+			return 0;
 	}
 
 	private static void add(int[] instruction, Integer[] input, int index)
 	{
 		int first = instruction[2];
 		int second = instruction[1];
-		int third = instruction[0];
 
 		int left = first == 0 ? input[index + 1] : index + 1;
 		int right = second == 0 ? input[index + 2] : index + 2;
@@ -157,7 +159,6 @@ public class Ac05
 	{
 		int first = instruction[2];
 		int second = instruction[1];
-		int third = instruction[0];
 
 		int left = first == 0 ? input[index + 1] : index + 1;
 		int right = second == 0 ? input[index + 2] : index + 2;
