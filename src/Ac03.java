@@ -11,7 +11,7 @@ public class Ac03
 	public static void main(String[] args)
 		throws IOException
 	{
-		Path input = new File("res/03.txt").toPath();
+		Path input = new File("res/input/03.txt").toPath();
 		List<Wire> wires = Files.readAllLines(input)
 								.stream()
 								.map(Wire::create)

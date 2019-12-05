@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class Ac01 {
     public static void main(String[] args) throws IOException {
-        Path input = new File("res/01.txt").toPath();
+        Path input = new File("res/input/01.txt").toPath();
 
         List<Integer> values = Files.readAllLines(input)
                 .stream()

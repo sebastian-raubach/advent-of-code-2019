@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Ac04 {
     public static void main(String[] args) throws IOException {
-        Path input = new File("res/04.txt").toPath();
+        Path input = new File("res/input/04.txt").toPath();
 
         String[] values = new String(Files.readAllBytes(input)).split("-");
 

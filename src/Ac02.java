@@ -22,7 +22,7 @@ public class Ac02 {
     }
 
     private static int computeOutput(int noun, int verb) throws IOException {
-        Path input = new File("res/02.txt").toPath();
+        Path input = new File("res/input/02.txt").toPath();
         Integer[] values = Arrays.stream(new String(Files.readAllBytes(input)).split(","))
                 .mapToInt(Integer::parseInt)
                 .boxed()
