@@ -1,15 +1,9 @@
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 public class Ac02 {
     public static void main(String[] args) throws IOException {
-        Path input = new File("res/input/02.txt").toPath();
-        int[] inputValues = Arrays.stream(new String(Files.readAllBytes(input)).split(","))
-                .mapToInt(Integer::parseInt)
-                .toArray();
+        int[] inputValues = TaskUtils.readAllInts("res/input/02.txt");
 
         int[] localValues = Arrays.copyOf(inputValues, inputValues.length);
         localValues[1] = 12;

@@ -1,6 +1,9 @@
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -21,106 +24,100 @@ public class Ac03
 		solvePartTwo(wires);
 	}
 
-	private static void solvePartOne(List<Wire> wires)
-	{
-		int first = getClosestCrossing(wires.get(0), wires.get(1));
-		if (first != 159)
-			throw new RuntimeException("Invalid distance");
+    private static void solvePartOne(List<Wire> wires) {
+        int i = 0;
+        System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
+        System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
+        System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
+    }
+
+    private static int calculateClosestCrossing(Wire one, Wire two) {
+        int min = Integer.MAX_VALUE;
+        // For each segment on ONE, check each segment on TWO
+        for (int a = 1; a < one.size(); a++) {
+            for (int b = 1; b < two.size(); b++) {
+                // If they intersect, get the distance of the crossing point
+                Point intersection = intersect(one.get(a - 1), one.get(a), two.get(b - 1), two.get(b));
+
+                if (intersection != null) {
+                    min = Math.min(min, intersection.getManhattan());
+                }
+            }
+        }
+
+        return min;
+    }
+
+    private static void solvePartTwo(List<Wire> wires) {
+        int i = 0;
+        System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
+        System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
+        System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
+    }
+
+    private static int calculateShortestCrossing(Wire one, Wire two) {
+        int min = Integer.MAX_VALUE;
+        // Total distance from start to crossing along both wires
+        int distance = 0;
+        for (int a = 1; a < one.size(); a++) {
+            // Local distance from the previous starting point to the closest crossing
+            int localDistance = distance;
+
+            Point aStart = one.get(a - 1);
+            Point aEnd = one.get(a);
+
+            // Check all segments on TWO for this segment of ONE
+            for (int b = 1; b < two.size(); b++) {
+                Point bStart = two.get(b - 1);
+                Point bEnd = two.get(b);
+
+                // Check if they intersect
+                Point intersection = intersect(aStart, aEnd, bStart, bEnd);
+
+                if (intersection != null) {
+                    // If they do, add the distance from both starting points to the crossing point
+                    localDistance += aStart.getManhattan(intersection) + bStart.getManhattan(intersection);
+                    // Check if it's smaller
+                    min = Math.min(min, localDistance);
+                    // Then return, because there cannot be a closer point
+                    break;
+                } else {
+                    // If they don't, add the distance on TWO
+                    localDistance += bStart.getManhattan(bEnd);
+                }
+            }
+            // Advance on ONE by one segment, so add the distance and then check again for the next segment
+            distance += aStart.getManhattan(aEnd);
+        }
+
+        return min;
+    }
+
+    private static Point getMin(Point a, Point b) {
+        return new Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
+    }
+
+    private static Point getMax(Point a, Point b) {
+        return new Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
+    }
+
+    private static Point intersect(Point aStart, Point aEnd, Point bStart, Point bEnd) {
+        Point aMin = getMin(aStart, aEnd);
+        Point aMax = getMax(aStart, aEnd);
+        Point bMin = getMin(bStart, bEnd);
+        Point bMax = getMax(bStart, bEnd);
+
+        // Ignore the crossing at the origin of the very first path segments
+        if (aStart.x == 0 && aStart.y == 0 && bStart.x == 0 && bStart.y == 0)
+            return null;
+
+        // Check both options where the paths could cross
+        if (aMin.x >= bMin.x && aMin.x <= bMax.x && bMin.y >= aMin.y && bMin.y <= aMax.y)
+            return new Point(aMin.x, bMin.y);
+        else if (bMin.x >= aMin.x && bMin.x <= aMax.x && aMin.y >= bMin.y && aMin.y <= bMax.y)
+            return new Point(bMin.x, aMin.y);
 		else
-			System.out.println("First test correct");
-		int second = getClosestCrossing(wires.get(2), wires.get(3));
-		if (second != 135)
-			throw new RuntimeException("Invalid distance");
-		else
-			System.out.println("Second test correct");
-		int third = getClosestCrossing(wires.get(4), wires.get(5));
-		System.out.println(third);
-	}
-
-	private static void solvePartTwo(List<Wire> wires)
-	{
-		int first = getShortestCrossing(wires.get(0), wires.get(1));
-		if (first != 610)
-			throw new RuntimeException("Invalid distance");
-		else
-			System.out.println("First test correct");
-		int second = getShortestCrossing(wires.get(2), wires.get(3));
-		if (second != 415)
-			throw new RuntimeException("Invalid distance");
-		else
-			System.out.println("Second test correct");
-		int third = getShortestCrossing(wires.get(4), wires.get(5));
-		System.out.println(third);
-	}
-
-	private static int getShortestCrossing(Wire one, Wire two)
-	{
-		Set<Point> aPathPoints = getPointsOnPath(one);
-		Set<Point> bPathPoints = getPointsOnPath(two);
-		int minDistance = Integer.MAX_VALUE;
-
-		int aCounter = 0;
-		int bCounter = 0;
-		for (Point a : aPathPoints)
-		{
-			aCounter++;
-			for (Point b : bPathPoints)
-			{
-				bCounter++;
-				if (a.x == b.x && a.y == b.y)
-					minDistance = Math.min(minDistance, aCounter + bCounter);
-			}
-			bCounter = 0;
-		}
-
-		return minDistance;
-	}
-
-	private static int getClosestCrossing(Wire one, Wire two)
-	{
-		Set<Point> aPathPoints = getPointsOnPath(one);
-		Set<Point> bPathPoints = getPointsOnPath(two);
-		int minDistance = Integer.MAX_VALUE;
-
-		for (Point a : aPathPoints)
-		{
-			for (Point b : bPathPoints)
-			{
-				if (a.x == b.x && a.y == b.y)
-					minDistance = Math.min(minDistance, a.getManhattan());
-			}
-		}
-
-		return minDistance;
-	}
-
-	private static Set<Point> getPointsOnPath(Wire wire)
-	{
-		Set<Point> points = new LinkedHashSet<>();
-
-		Point prev = new Point(0, 0);
-		for (Point p : wire)
-		{
-			if (prev.x == p.x)
-			{
-				int minY = Math.min(prev.y, p.y);
-				int maxY = Math.max(prev.y, p.y);
-
-				for (int y = minY + 1; y <= maxY; y++)
-					points.add(new Point(prev.x, y));
-			}
-			else
-			{
-				int minX = Math.min(prev.x, p.x);
-				int maxX = Math.max(prev.x, p.x);
-
-				for (int x = minX + 1; x <= maxX; x++)
-					points.add(new Point(x, prev.y));
-			}
-			prev = p;
-		}
-
-		return points;
+            return null;
 	}
 
 	private static class Wire extends ArrayList<Point>
@@ -165,6 +162,7 @@ public class Ac03
 				result.add(new Point(deltaX, deltaY));
 			}
 
+            result.add(0, new Point(0, 0));
 			return result;
 		}
 	}
@@ -184,5 +182,9 @@ public class Ac03
 		{
 			return Math.abs(x) + Math.abs(y);
 		}
+
+        public int getManhattan(Point other) {
+            return Math.abs(x - other.x) + Math.abs(y - other.y);
+        }
 	}
 }

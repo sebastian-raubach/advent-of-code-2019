@@ -1,25 +1,18 @@
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
 public class Ac01 {
     public static void main(String[] args) throws IOException {
-        Path input = new File("res/input/01.txt").toPath();
+        int[] values = TaskUtils.readAllInts("res/input/01.txt");
 
-        List<Integer> values = Files.readAllLines(input)
-                .stream()
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
-
-        long sum = values.stream()
+        long sum = Arrays.stream(values)
+                .boxed()
                 .mapToInt(Ac01::getFuelRequirement)
                 .sum();
         System.out.println(sum);
 
-        sum = values.stream()
+        sum = Arrays.stream(values)
+                .boxed()
                 .mapToInt(Ac01::getFuelRequirementRecursive)
                 .sum();
         System.out.println(sum);
