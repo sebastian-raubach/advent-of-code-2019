@@ -12,112 +12,125 @@ import java.util.stream.Collectors;
 public class Ac03
 {
 	public static void main(String[] args)
-		throws IOException
+			throws IOException
 	{
 		Path input = new File("res/input/03.txt").toPath();
 		List<Wire> wires = Files.readAllLines(input)
-								.stream()
-								.map(Wire::create)
-								.collect(Collectors.toList());
+				.stream()
+				.map(Wire::create)
+				.collect(Collectors.toList());
 
 		solvePartOne(wires);
 		solvePartTwo(wires);
 	}
 
-    private static void solvePartOne(List<Wire> wires) {
-        int i = 0;
-        System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
-        System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
-        System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
-    }
+	private static void solvePartOne(List<Wire> wires)
+	{
+		int i = 0;
+		System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
+		System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
+		System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
+	}
 
-    private static int calculateClosestCrossing(Wire one, Wire two) {
-        int min = Integer.MAX_VALUE;
-        // For each segment on ONE, check each segment on TWO
-        for (int a = 1; a < one.size(); a++) {
-            for (int b = 1; b < two.size(); b++) {
-                // If they intersect, get the distance of the crossing point
-                Point intersection = intersect(one.get(a - 1), one.get(a), two.get(b - 1), two.get(b));
+	private static int calculateClosestCrossing(Wire one, Wire two)
+	{
+		int min = Integer.MAX_VALUE;
+		// For each segment on ONE, check each segment on TWO
+		for (int a = 1; a < one.size(); a++)
+		{
+			for (int b = 1; b < two.size(); b++)
+			{
+				// If they intersect, get the distance of the crossing point
+				Point intersection = intersect(one.get(a - 1), one.get(a), two.get(b - 1), two.get(b));
 
-                if (intersection != null) {
-                    min = Math.min(min, intersection.getManhattan());
-                }
-            }
-        }
+				if (intersection != null)
+					min = Math.min(min, intersection.getManhattan());
+			}
+		}
 
-        return min;
-    }
+		return min;
+	}
 
-    private static void solvePartTwo(List<Wire> wires) {
-        int i = 0;
-        System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
-        System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
-        System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
-    }
+	private static void solvePartTwo(List<Wire> wires)
+	{
+		int i = 0;
+		System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
+		System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
+		System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
+	}
 
-    private static int calculateShortestCrossing(Wire one, Wire two) {
-        int min = Integer.MAX_VALUE;
-        // Total distance from start to crossing along both wires
-        int distance = 0;
-        for (int a = 1; a < one.size(); a++) {
-            // Local distance from the previous starting point to the closest crossing
-            int localDistance = distance;
+	private static int calculateShortestCrossing(Wire one, Wire two)
+	{
+		int min = Integer.MAX_VALUE;
+		// Total distance from start to crossing along both wires
+		int distance = 0;
+		for (int a = 1; a < one.size(); a++)
+		{
+			// Local distance from the previous starting point to the closest crossing
+			int localDistance = distance;
 
-            Point aStart = one.get(a - 1);
-            Point aEnd = one.get(a);
+			Point aStart = one.get(a - 1);
+			Point aEnd = one.get(a);
 
-            // Check all segments on TWO for this segment of ONE
-            for (int b = 1; b < two.size(); b++) {
-                Point bStart = two.get(b - 1);
-                Point bEnd = two.get(b);
+			// Check all segments on TWO for this segment of ONE
+			for (int b = 1; b < two.size(); b++)
+			{
+				Point bStart = two.get(b - 1);
+				Point bEnd = two.get(b);
 
-                // Check if they intersect
-                Point intersection = intersect(aStart, aEnd, bStart, bEnd);
+				// Check if they intersect
+				Point intersection = intersect(aStart, aEnd, bStart, bEnd);
 
-                if (intersection != null) {
-                    // If they do, add the distance from both starting points to the crossing point
-                    localDistance += aStart.getManhattan(intersection) + bStart.getManhattan(intersection);
-                    // Check if it's smaller
-                    min = Math.min(min, localDistance);
-                    // Then return, because there cannot be a closer point
-                    break;
-                } else {
-                    // If they don't, add the distance on TWO
-                    localDistance += bStart.getManhattan(bEnd);
-                }
-            }
-            // Advance on ONE by one segment, so add the distance and then check again for the next segment
-            distance += aStart.getManhattan(aEnd);
-        }
+				if (intersection != null)
+				{
+					// If they do, add the distance from both starting points to the crossing point
+					localDistance += aStart.getManhattan(intersection) + bStart.getManhattan(intersection);
+					// Check if it's smaller
+					min = Math.min(min, localDistance);
+					// Then return, because there cannot be a closer point
+					break;
+				}
+				else
+				{
+					// If they don't, add the distance on TWO
+					localDistance += bStart.getManhattan(bEnd);
+				}
+			}
+			// Advance on ONE by one segment, so add the distance and then check again for the next segment
+			distance += aStart.getManhattan(aEnd);
+		}
 
-        return min;
-    }
+		return min;
+	}
 
-    private static Point getMin(Point a, Point b) {
-        return new Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
-    }
+	private static Point getMin(Point a, Point b)
+	{
+		return new Point(Math.min(a.x, b.x), Math.min(a.y, b.y));
+	}
 
-    private static Point getMax(Point a, Point b) {
-        return new Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
-    }
+	private static Point getMax(Point a, Point b)
+	{
+		return new Point(Math.max(a.x, b.x), Math.max(a.y, b.y));
+	}
 
-    private static Point intersect(Point aStart, Point aEnd, Point bStart, Point bEnd) {
-        Point aMin = getMin(aStart, aEnd);
-        Point aMax = getMax(aStart, aEnd);
-        Point bMin = getMin(bStart, bEnd);
-        Point bMax = getMax(bStart, bEnd);
+	private static Point intersect(Point aStart, Point aEnd, Point bStart, Point bEnd)
+	{
+		Point aMin = getMin(aStart, aEnd);
+		Point aMax = getMax(aStart, aEnd);
+		Point bMin = getMin(bStart, bEnd);
+		Point bMax = getMax(bStart, bEnd);
 
-        // Ignore the crossing at the origin of the very first path segments
-        if (aStart.x == 0 && aStart.y == 0 && bStart.x == 0 && bStart.y == 0)
-            return null;
+		// Ignore the crossing at the origin of the very first path segments
+		if (aStart.x == 0 && aStart.y == 0 && bStart.x == 0 && bStart.y == 0)
+			return null;
 
-        // Check both options where the paths could cross
-        if (aMin.x >= bMin.x && aMin.x <= bMax.x && bMin.y >= aMin.y && bMin.y <= aMax.y)
-            return new Point(aMin.x, bMin.y);
-        else if (bMin.x >= aMin.x && bMin.x <= aMax.x && aMin.y >= bMin.y && aMin.y <= bMax.y)
-            return new Point(bMin.x, aMin.y);
+		// Check both options where the paths could cross
+		if (aMin.x >= bMin.x && aMin.x <= bMax.x && bMin.y >= aMin.y && bMin.y <= aMax.y)
+			return new Point(aMin.x, bMin.y);
+		else if (bMin.x >= aMin.x && bMin.x <= aMax.x && aMin.y >= bMin.y && aMin.y <= bMax.y)
+			return new Point(bMin.x, aMin.y);
 		else
-            return null;
+			return null;
 	}
 
 	private static class Wire extends ArrayList<Point>
@@ -162,7 +175,7 @@ public class Ac03
 				result.add(new Point(deltaX, deltaY));
 			}
 
-            result.add(0, new Point(0, 0));
+			result.add(0, new Point(0, 0));
 			return result;
 		}
 	}
@@ -183,8 +196,9 @@ public class Ac03
 			return Math.abs(x) + Math.abs(y);
 		}
 
-        public int getManhattan(Point other) {
-            return Math.abs(x - other.x) + Math.abs(y - other.y);
-        }
+		public int getManhattan(Point other)
+		{
+			return Math.abs(x - other.x) + Math.abs(y - other.y);
+		}
 	}
 }

@@ -1,6 +1,11 @@
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sebastian Raubach
@@ -10,26 +15,26 @@ public class Ac06
 	private static Map<String, Node> nodes = new HashMap<>();
 
 	public static void main(String[] args)
-		throws IOException
+			throws IOException
 	{
 		Path input = new File("res/input/06.txt").toPath();
 
 		Files.readAllLines(input)
-			 .forEach(s -> {
-				 String[] parts = s.split("\\)");
+				.forEach(s -> {
+					String[] parts = s.split("\\)");
 
-				 Node first = nodes.get(parts[0]);
-				 if (first == null)
-					 first = new Node(parts[0]);
-				 Node second = nodes.get(parts[1]);
-				 if (second == null)
-					 second = new Node(parts[1]);
+					Node first = nodes.get(parts[0]);
+					if (first == null)
+						first = new Node(parts[0]);
+					Node second = nodes.get(parts[1]);
+					if (second == null)
+						second = new Node(parts[1]);
 
-				 second.parent = first;
+					second.parent = first;
 
-				 nodes.put(first.name, first);
-				 nodes.put(second.name, second);
-			 });
+					nodes.put(first.name, first);
+					nodes.put(second.name, second);
+				});
 
 		System.out.println(solvePartOne());
 		System.out.println(solvePartTwo());
@@ -38,8 +43,8 @@ public class Ac06
 	private static int solvePartOne()
 	{
 		return nodes.values().stream()
-					.mapToInt(n -> getDistanceToRoot(n, 0))
-					.sum();
+				.mapToInt(n -> getDistanceToRoot(n, 0))
+				.sum();
 	}
 
 	private static int solvePartTwo()
@@ -60,9 +65,8 @@ public class Ac06
 		{
 			int j = orderedFromEnd.indexOf(orderedFromStart.get(i));
 
-			if (j != -1) {
+			if (j != -1)
 				min = Math.min(i + j + 2, min);
-			}
 		}
 
 		return min;
@@ -94,7 +98,7 @@ public class Ac06
 	private static class Node
 	{
 		private String name;
-		private Node   parent;
+		private Node parent;
 
 		public Node(String name)
 		{
