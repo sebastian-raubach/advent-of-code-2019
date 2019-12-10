@@ -1,19 +1,23 @@
 public class IntCode
 {
-	private int[] inputSequence;
+	private long[] inputSequence;
 	private int operatorPosition = 0;
 	private int currentOperation = 0;
+	private int relativeBase = 0;
 	private int[] currentOperatorSequence;
+	private int increment;
 
-	public IntCode(int[] inputSequence)
+	public IntCode(long[] inputSequence)
 	{
-		this.inputSequence = inputSequence;
+		this.inputSequence = new long[inputSequence.length * 1000];
+
+		System.arraycopy(inputSequence, 0, this.inputSequence, 0, inputSequence.length);
 	}
 
-	private static int[] instructionToParts(int input)
+	private static int[] instructionToParts(long input)
 	{
 		int[] result = new int[5];
-		char[] parts = Integer.toString(input).toCharArray();
+		char[] parts = Long.toString(input).toCharArray();
 
 		int delta = result.length - parts.length;
 
@@ -25,22 +29,21 @@ public class IntCode
 
 	public boolean canContinue()
 	{
-		return currentOperation != 99;
+		return inputSequence[operatorPosition] != 99;
 	}
 
-	public int computeOutput(int... manualInput)
+	public long computeOutput(long... manualInput)
 	{
 		int manualInputPointer = 0;
 
 		loop:
-		while (operatorPosition < inputSequence.length)
+		while (true)
 		{
-			Integer value = inputSequence[operatorPosition];
-			int increment = 0;
+			long value = inputSequence[operatorPosition];
+			increment = 0;
 
 			currentOperatorSequence = instructionToParts(value);
 			currentOperation = currentOperatorSequence[3] * 10 + currentOperatorSequence[4];
-			int delta;
 			switch (currentOperation)
 			{
 				case 99:
@@ -54,26 +57,19 @@ public class IntCode
 					increment = 4;
 					break;
 				case 3:
-					inputSequence[inputSequence[operatorPosition + 1]] = manualInput[manualInputPointer++];
+					inputSequence[getAddress(1, currentOperatorSequence[2])] = manualInput[manualInputPointer++];
 					increment = 2;
 					break;
 				case 4:
-					int result = inputSequence[inputSequence[operatorPosition + 1]];
+					int index = getIndex(1, currentOperatorSequence[2]);
+					long result = inputSequence[index];
 					operatorPosition += 2;
 					return result;
 				case 5:
-					delta = jumpIfTrue();
-					if (delta == 0)
-						increment = 3;
-					else
-						operatorPosition = delta;
+					jumpIfTrue();
 					break;
 				case 6:
-					delta = jumpIfFalse();
-					if (delta == 0)
-						increment = 3;
-					else
-						operatorPosition = delta;
+					jumpIfFalse();
 					break;
 				case 7:
 					lessThan();
@@ -83,6 +79,10 @@ public class IntCode
 					isEqual();
 					increment = 4;
 					break;
+				case 9:
+					relativeBase += inputSequence[getIndex(1, currentOperatorSequence[2])];
+					increment = 2;
+					break;
 			}
 
 			operatorPosition += increment;
@@ -91,14 +91,40 @@ public class IntCode
 		return inputSequence[0];
 	}
 
+	private int getIndex(int offset, int mode)
+	{
+		switch (mode)
+		{
+			case 0:
+				return (int) inputSequence[operatorPosition + offset];
+			case 1:
+				return operatorPosition + offset;
+			case 2:
+				return (int) inputSequence[operatorPosition + offset] + relativeBase;
+			default:
+				return operatorPosition;
+		}
+	}
+
+	private int getAddress(int offset, int mode)
+	{
+		switch (mode)
+		{
+			case 0:
+			case 1:
+				return (int) inputSequence[operatorPosition + offset];
+			case 2:
+				return (int) inputSequence[operatorPosition + offset] + relativeBase;
+			default:
+				return operatorPosition;
+		}
+	}
+
 	private void lessThan()
 	{
-		int first = currentOperatorSequence[2];
-		int second = currentOperatorSequence[1];
-
-		int left = first == 0 ? inputSequence[operatorPosition + 1] : operatorPosition + 1;
-		int right = second == 0 ? inputSequence[operatorPosition + 2] : operatorPosition + 2;
-		int target = inputSequence[operatorPosition + 3];
+		int left = getIndex(1, currentOperatorSequence[2]);
+		int right = getIndex(2, currentOperatorSequence[1]);
+		int target = getAddress(3, currentOperatorSequence[0]);
 
 		if (inputSequence[left] < inputSequence[right])
 			inputSequence[target] = 1;
@@ -108,12 +134,9 @@ public class IntCode
 
 	private void isEqual()
 	{
-		int first = currentOperatorSequence[2];
-		int second = currentOperatorSequence[1];
-
-		int left = first == 0 ? inputSequence[operatorPosition + 1] : operatorPosition + 1;
-		int right = second == 0 ? inputSequence[operatorPosition + 2] : operatorPosition + 2;
-		int target = inputSequence[operatorPosition + 3];
+		int left = getIndex(1, currentOperatorSequence[2]);
+		int right = getIndex(2, currentOperatorSequence[1]);
+		int target = getAddress(3, currentOperatorSequence[0]);
 
 		if (inputSequence[left] == inputSequence[right])
 			inputSequence[target] = 1;
@@ -121,54 +144,42 @@ public class IntCode
 			inputSequence[target] = 0;
 	}
 
-	private int jumpIfTrue()
+	private void jumpIfTrue()
 	{
-		int first = currentOperatorSequence[2];
-		int second = currentOperatorSequence[1];
-
-		int left = first == 0 ? inputSequence[operatorPosition + 1] : operatorPosition + 1;
-		int right = second == 0 ? inputSequence[operatorPosition + 2] : operatorPosition + 2;
+		int left = getIndex(1, currentOperatorSequence[2]);
+		int right = getIndex(2, currentOperatorSequence[1]);
 
 		if (inputSequence[left] != 0)
-			return inputSequence[right];
+			operatorPosition = (int) inputSequence[right];
 		else
-			return 0;
+			increment = 3;
 	}
 
-	private int jumpIfFalse()
+	private void jumpIfFalse()
 	{
-		int first = currentOperatorSequence[2];
-		int second = currentOperatorSequence[1];
-
-		int left = first == 0 ? inputSequence[operatorPosition + 1] : operatorPosition + 1;
-		int right = second == 0 ? inputSequence[operatorPosition + 2] : operatorPosition + 2;
+		int left = getIndex(1, currentOperatorSequence[2]);
+		int right = getIndex(2, currentOperatorSequence[1]);
 
 		if (inputSequence[left] == 0)
-			return inputSequence[right];
+			operatorPosition = (int) inputSequence[right];
 		else
-			return 0;
+			increment = 3;
 	}
 
 	private void add()
 	{
-		int first = currentOperatorSequence[2];
-		int second = currentOperatorSequence[1];
-
-		int left = first == 0 ? inputSequence[operatorPosition + 1] : operatorPosition + 1;
-		int right = second == 0 ? inputSequence[operatorPosition + 2] : operatorPosition + 2;
-		int target = inputSequence[operatorPosition + 3];
+		int left = getIndex(1, currentOperatorSequence[2]);
+		int right = getIndex(2, currentOperatorSequence[1]);
+		int target = getAddress(3, currentOperatorSequence[0]);
 
 		inputSequence[target] = inputSequence[left] + inputSequence[right];
 	}
 
 	private void multiply()
 	{
-		int first = currentOperatorSequence[2];
-		int second = currentOperatorSequence[1];
-
-		int left = first == 0 ? inputSequence[operatorPosition + 1] : operatorPosition + 1;
-		int right = second == 0 ? inputSequence[operatorPosition + 2] : operatorPosition + 2;
-		int target = inputSequence[operatorPosition + 3];
+		int left = getIndex(1, currentOperatorSequence[2]);
+		int right = getIndex(2, currentOperatorSequence[1]);
+		int target = getAddress(3, currentOperatorSequence[0]);
 
 		inputSequence[target] = inputSequence[left] * inputSequence[right];
 	}

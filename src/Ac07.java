@@ -14,17 +14,17 @@ public class Ac07
 
 	private static void solvePartOne() throws IOException
 	{
-		int[] inputValues = TaskUtils.readAllInts("res/input/07.txt", ",");
+		long[] inputValues = TaskUtils.readAllLongs("res/input/07.txt", ",");
 
-		int[] values = new int[]{0, 1, 2, 3, 4};
-		List<int[]> permutations = new ArrayList<>();
+		long[] values = new long[]{0, 1, 2, 3, 4};
+		List<long[]> permutations = new ArrayList<>();
 		permute(permutations, values, 0);
 
-		int max = -Integer.MAX_VALUE;
+		long max = -Long.MAX_VALUE;
 
-		for (int[] order : permutations)
+		for (long[] order : permutations)
 		{
-			int intermediate = new IntCode(inputValues).computeOutput(order[0], 0);
+			long intermediate = new IntCode(inputValues).computeOutput(order[0], 0);
 			intermediate = new IntCode(inputValues).computeOutput(order[1], intermediate);
 			intermediate = new IntCode(inputValues).computeOutput(order[2], intermediate);
 			intermediate = new IntCode(inputValues).computeOutput(order[3], intermediate);
@@ -38,15 +38,15 @@ public class Ac07
 
 	private static void solvePartTwo() throws IOException
 	{
-		int[] inputValues = TaskUtils.readAllInts("res/input/07.txt", ",");
+		long[] inputValues = TaskUtils.readAllLongs("res/input/07.txt", ",");
 
-		int[] values = new int[]{5, 6, 7, 8, 9};
-		List<int[]> result = new ArrayList<>();
+		long[] values = new long[]{5, 6, 7, 8, 9};
+		List<long[]> result = new ArrayList<>();
 		permute(result, values, 0);
 
-		int max = -Integer.MAX_VALUE;
+		long max = -Long.MAX_VALUE;
 
-		for (int[] order : result)
+		for (long[] order : result)
 		{
 			IntCode one = new IntCode(inputValues);
 			IntCode two = new IntCode(inputValues);
@@ -55,7 +55,7 @@ public class Ac07
 			IntCode five = new IntCode(inputValues);
 
 			// Do an initial round with the phase settings
-			int intermediate = one.computeOutput(order[0], 0);
+			long intermediate = one.computeOutput(order[0], 0);
 			intermediate = two.computeOutput(order[1], intermediate);
 			intermediate = three.computeOutput(order[2], intermediate);
 			intermediate = four.computeOutput(order[3], intermediate);
@@ -77,7 +77,7 @@ public class Ac07
 		System.out.println(max);
 	}
 
-	private static void permute(List<int[]> result, int[] arr, int index)
+	private static void permute(List<long[]> result, long[] arr, int index)
 	{
 		for (int i = index; i < arr.length; i++)
 		{
@@ -90,9 +90,9 @@ public class Ac07
 			result.add(Arrays.copyOf(arr, arr.length));
 	}
 
-	private static void swap(int[] a, int i, int j)
+	private static void swap(long[] a, int i, int j)
 	{
-		int t = a[i];
+		long t = a[i];
 		a[i] = a[j];
 		a[j] = t;
 	}

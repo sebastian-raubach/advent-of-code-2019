@@ -15,6 +15,14 @@ public class TaskUtils
 				.toArray();
 	}
 
+	public static long[] readAllLongs(String path, String separator) throws IOException
+	{
+		Path input = new File(path).toPath();
+		return Arrays.stream(new String(Files.readAllBytes(input)).split(separator))
+				.mapToLong(Long::parseLong)
+				.toArray();
+	}
+
 	public static int[] readAllInts(String path) throws IOException
 	{
 		Path input = new File(path).toPath();

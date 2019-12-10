@@ -5,9 +5,9 @@ public class Ac02
 {
 	public static void main(String[] args) throws IOException
 	{
-		int[] inputValues = TaskUtils.readAllInts("res/input/02.txt", ",");
+		long[] inputValues = TaskUtils.readAllLongs("res/input/02.txt", ",");
 
-		int[] localValues = Arrays.copyOf(inputValues, inputValues.length);
+		long[] localValues = Arrays.copyOf(inputValues, inputValues.length);
 		localValues[1] = 12;
 		localValues[2] = 2;
 
@@ -25,7 +25,7 @@ public class Ac02
 
 				IntCode intCode = new IntCode(localValues);
 
-				int output = intCode.computeOutput();
+				long output = intCode.computeOutput();
 
 				if (output == 19690720)
 				{

@@ -12,7 +12,7 @@ public class Ac05
 	public static void main(String[] args)
 			throws IOException
 	{
-		int[] inputValues = TaskUtils.readAllInts("res/input/05.txt", ",");
+		long[] inputValues = TaskUtils.readAllLongs("res/input/05.txt", ",");
 
 		IntCode one = new IntCode(Arrays.copyOf(inputValues, inputValues.length));
 		while (one.canContinue())
