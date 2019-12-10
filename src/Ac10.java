@@ -2,10 +2,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 public class Ac10
 {
@@ -25,15 +24,30 @@ public class Ac10
 			}
 		}
 
-		// TODO: Need to calculate numbers between pairs instead!
-		Map<Float, Long> map = points.stream()
-				.map(Point::toFraction)
-				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+		System.out.println(points.size());
 
-		System.out.println(map.values()
-				.stream()
-				.mapToLong(l -> l)
-				.max());
+		Point maxPoint = null;
+		int maxStations = 0;
+		for (int i = 0; i < points.size(); i++)
+		{
+			Point p = points.get(i);
+			Set<Float> fractions = new HashSet<>();
+			points.stream()
+					.filter(q -> !(p.x == q.x && p.y == q.y))
+					.forEach(q -> {
+						Point delta = p.delta(q);
+						fractions.add(delta.toFraction());
+					});
+
+			if (fractions.size() > maxStations)
+			{
+				maxStations = fractions.size();
+				maxPoint = p;
+			}
+		}
+		;
+
+		System.out.println(maxPoint + " -> " + maxStations);
 	}
 
 	private static class Point
@@ -49,7 +63,12 @@ public class Ac10
 
 		public Float toFraction()
 		{
-			return x / (1f * y);
+			return (float) Math.atan2(x, y);
+		}
+
+		public Point delta(Point other)
+		{
+			return new Point(other.x - x, other.y - y);
 		}
 
 		@Override
