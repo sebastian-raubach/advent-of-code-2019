@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +36,45 @@ public class Ac12
 		System.out.println(total);
 	}
 
+	private static void solvePartTwo() throws IOException
+	{
+		List<Moon> moons = Files.readAllLines(new File("res/input/12.txt").toPath())
+				.stream()
+				.map((Moon::parse))
+				.collect(Collectors.toList());
+
+		int[] xPos = getPositions(moons, 0);
+		int[] xVel = getVelocities(moons, 1);
+		int[] yPos = getPositions(moons, 1);
+		int[] yVel = getVelocities(moons, 1);
+		int[] zPos = getPositions(moons, 2);
+		int[] zVel = getVelocities(moons, 2);
+
+		int counter = 0;
+		int xIndex = -1;
+		int yIndex = -1;
+		int zIndex = -1;
+
+		boolean found = false;
+		while (!found)
+		{
+			counter++;
+
+			applyRound(moons);
+
+			if (xIndex == -1)
+				xIndex = Arrays.equals(xPos, getPositions(moons, 0)) && Arrays.equals(xVel, getVelocities(moons, 0)) ? counter : -1;
+			if (yIndex == -1)
+				yIndex = Arrays.equals(yPos, getPositions(moons, 1)) && Arrays.equals(yVel, getVelocities(moons, 1)) ? counter : -1;
+			if (zIndex == -1)
+				zIndex = Arrays.equals(zPos, getPositions(moons, 2)) && Arrays.equals(zVel, getVelocities(moons, 2)) ? counter : -1;
+
+			found = xIndex != -1 && yIndex != -1 && zIndex != -1;
+		}
+
+		System.out.println(lcm(xIndex, yIndex, zIndex));
+	}
+
 	private static void applyRound(List<Moon> moons)
 	{
 		for (Moon first : moons)
@@ -53,41 +91,36 @@ public class Ac12
 		}
 	}
 
-	private static void solvePartTwo() throws IOException
+	private static int[] getPositions(List<Moon> moons, int dim)
 	{
-		List<Moon> moons = Files.readAllLines(new File("res/input/12.txt").toPath())
-				.stream()
-				.map((Moon::parse))
-				.collect(Collectors.toList());
-
-		long counter = 0;
-		List<String> states = new ArrayList<>();
-
-		int matchIndex = -1;
-		while (matchIndex == -1)
-		{
-			applyRound(moons);
-
-			matchIndex = states.indexOf(getState(moons));
-			counter++;
-
-			if (counter % 100000 == 0)
-				System.out.println(counter);
-		}
-
-		System.out.println(counter);
+		return moons.stream()
+				.mapToInt(m -> m.position[dim])
+				.toArray();
 	}
 
-	private static String getState(List<Moon> moons)
+	private static int[] getVelocities(List<Moon> moons, int dim)
 	{
-		String result = "";
+		return moons.stream()
+				.mapToInt(m -> m.velocity[dim])
+				.toArray();
+	}
 
-		for (Moon moon : moons)
+	private static long gcd(long a, long b)
+	{
+		if (a == 0)
+			return b;
+		return gcd(b % a, a);
+	}
+
+	private static long lcm(long... inputs)
+	{
+		if (inputs.length == 0) return 0;
+		long rVal = inputs[0];
+		for (int i = 0; i < inputs.length; i++)
 		{
-			result += "." + moon.position[0] + "." + moon.position[1] + "." + moon.position[2];
+			rVal = (rVal * inputs[i]) / gcd(rVal, inputs[i]);
 		}
-
-		return result;
+		return rVal;
 	}
 
 	private static class Moon
@@ -140,13 +173,9 @@ public class Ac12
 		private void adjustVelocityPosition(int i, int other)
 		{
 			if (position[i] > other)
-			{
 				velocity[i]--;
-			}
 			else if (position[i] < other)
-			{
 				velocity[i]++;
-			}
 		}
 
 		@Override
