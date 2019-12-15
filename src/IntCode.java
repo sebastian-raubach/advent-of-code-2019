@@ -2,15 +2,14 @@ public class IntCode
 {
 	private long[] inputSequence;
 	private int operatorPosition = 0;
-	private int currentOperation = 0;
 	private int relativeBase = 0;
 	private int[] currentOperatorSequence;
 	private int increment;
 
 	public IntCode(long[] inputSequence)
 	{
+		// Copy the array onto a much larger array. This was necessary because some tasks needed more memory.
 		this.inputSequence = new long[inputSequence.length * 1000];
-
 		System.arraycopy(inputSequence, 0, this.inputSequence, 0, inputSequence.length);
 	}
 
@@ -43,7 +42,7 @@ public class IntCode
 			increment = 0;
 
 			currentOperatorSequence = instructionToParts(value);
-			currentOperation = currentOperatorSequence[3] * 10 + currentOperatorSequence[4];
+			int currentOperation = currentOperatorSequence[3] * 10 + currentOperatorSequence[4];
 			switch (currentOperation)
 			{
 				case 99:

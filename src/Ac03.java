@@ -3,14 +3,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author Sebastian Raubach
  */
-public class Ac03
+public class Ac03 extends AbstractTask
 {
+	private List<Wire> wires;
+
+	public Ac03(List<Wire> wires)
+	{
+		this.wires = wires;
+	}
+
 	public static void main(String[] args)
 			throws IOException
 	{
@@ -20,16 +28,39 @@ public class Ac03
 				.map(Wire::create)
 				.collect(Collectors.toList());
 
-		solvePartOne(wires);
-		solvePartTwo(wires);
+		new Ac03(wires).run();
 	}
 
-	private static void solvePartOne(List<Wire> wires)
+	@Override
+	protected boolean test()
 	{
-		int i = 0;
-		System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
-		System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
-		System.out.println(calculateClosestCrossing(wires.get(i++), wires.get(i++)));
+		try
+		{
+			List<Wire> wires = Arrays.stream("R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83".split("\n"))
+					.map(Wire::create)
+					.collect(Collectors.toList());
+			assert calculateClosestCrossing(wires.get(0), wires.get(1)) == 159;
+			assert calculateShortestCrossing(wires.get(0), wires.get(1)) == 610;
+
+			wires = Arrays.stream("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7".split("\n"))
+					.map(Wire::create)
+					.collect(Collectors.toList());
+			assert calculateClosestCrossing(wires.get(0), wires.get(1)) == 135;
+			assert calculateShortestCrossing(wires.get(0), wires.get(1)) == 410;
+		}
+		catch (AssertionError e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	protected void solvePartOne()
+	{
+		System.out.println(calculateClosestCrossing(wires.get(0), wires.get(0)));
 	}
 
 	private static int calculateClosestCrossing(Wire one, Wire two)
@@ -51,12 +82,10 @@ public class Ac03
 		return min;
 	}
 
-	private static void solvePartTwo(List<Wire> wires)
+	@Override
+	protected void solvePartTwo()
 	{
-		int i = 0;
-		System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
-		System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
-		System.out.println(calculateShortestCrossing(wires.get(i++), wires.get(i++)));
+		System.out.println(calculateShortestCrossing(wires.get(0), wires.get(0)));
 	}
 
 	private static int calculateShortestCrossing(Wire one, Wire two)

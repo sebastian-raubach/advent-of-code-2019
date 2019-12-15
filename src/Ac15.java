@@ -15,9 +15,13 @@ public class Ac15
 	 * The IntCode instance
 	 */
 	private IntCode intCode;
-	/** The labyrinth used as we walk through it */
+	/**
+	 * The labyrinth used as we walk through it
+	 */
 	private int[][] labyrinth = new int[44][44];
-	/** After part 1, this contains the labyrinth structure, part 2 then fills this with oxygen */
+	/**
+	 * After part 1, this contains the labyrinth structure, part 2 then fills this with oxygen
+	 */
 	private int[][] oxygen = new int[44][44];
 
 	public Ac15() throws IOException

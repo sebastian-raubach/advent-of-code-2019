@@ -2,26 +2,56 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Ac04
+public class Ac04 extends AbstractTask
 {
+	private int start;
+	private int end;
+	private int length;
+
+	public Ac04(String[] values)
+	{
+		this.start = Integer.parseInt(values[0]);
+		this.end = Integer.parseInt(values[1]);
+		this.length = values[0].length();
+	}
+
 	public static void main(String[] args) throws IOException
 	{
 		Path input = new File("res/input/04.txt").toPath();
 
 		String[] values = new String(Files.readAllBytes(input)).split("-");
 
-		System.out.println(Arrays.toString(getNrOfPasswords(Integer.parseInt(values[0]), Integer.parseInt(values[1]), values[0].length())));
+		new Ac04(values).run();
 	}
 
-	private static int[] getNrOfPasswords(int start, int end, int length)
+	@Override
+	protected boolean test()
 	{
-		int partOneCounter = 0;
-		int partTwoCounter = 0;
+		try
+		{
+			assert isValidPartOne(TaskUtils.mapToInts("111111", ""));
+			assert !isValidPartOne(TaskUtils.mapToInts("223450", ""));
+			assert !isValidPartOne(TaskUtils.mapToInts("123789", ""));
 
+			assert isValidPartTwo(TaskUtils.mapToInts("112233", ""));
+			assert !isValidPartTwo(TaskUtils.mapToInts("123444", ""));
+			assert isValidPartTwo(TaskUtils.mapToInts("111122", ""));
+		}
+		catch (AssertionError e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	protected void solvePartOne()
+	{
+		int counter = 0;
 		for (int i = start; i <= end; i++)
 		{
 			int[] number = new int[length];
@@ -32,12 +62,30 @@ public class Ac04
 				number[j] = Integer.parseInt(current.charAt(j) + "");
 
 			if (isValidPartOne(number))
-				partOneCounter++;
-			if (isValidPartTwo(number))
-				partTwoCounter++;
+				counter++;
 		}
 
-		return new int[]{partOneCounter, partTwoCounter};
+		System.out.println(counter);
+	}
+
+	@Override
+	protected void solvePartTwo()
+	{
+		int counter = 0;
+		for (int i = start; i <= end; i++)
+		{
+			int[] number = new int[length];
+
+			String current = String.format("%0" + length + "d", i);
+
+			for (int j = 0; j < length; j++)
+				number[j] = Integer.parseInt(current.charAt(j) + "");
+
+			if (isValidPartTwo(number))
+				counter++;
+		}
+
+		System.out.println(counter);
 	}
 
 	private static boolean isValidPartOne(int[] number)
