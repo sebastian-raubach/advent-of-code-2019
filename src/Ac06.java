@@ -2,25 +2,34 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Sebastian Raubach
  */
-public class Ac06
+public class Ac06 extends AbstractTask
 {
-	private static Map<String, Node> nodes = new HashMap<>();
+	private Map<String, Node> nodes;
+
+	public Ac06(Map<String, Node> nodes)
+	{
+		this.nodes = nodes;
+	}
 
 	public static void main(String[] args)
 			throws IOException
 	{
 		Path input = new File("res/input/06.txt").toPath();
 
-		Files.readAllLines(input)
-				.forEach(s -> {
+		new Ac06(getMapping(new String(Files.readAllBytes(input)))).run();
+	}
+
+	private static Map<String, Node> getMapping(String input)
+	{
+		Map<String, Node> nodes = new HashMap<>();
+		Arrays.stream(input.split("\r\n"))
+				.forEach(s ->
+				{
 					String[] parts = s.split("\\)");
 
 					Node first = nodes.get(parts[0]);
@@ -36,26 +45,48 @@ public class Ac06
 					nodes.put(second.name, second);
 				});
 
-		System.out.println(solvePartOne());
-		System.out.println(solvePartTwo());
+		return nodes;
 	}
 
-	private static int solvePartOne()
+	@Override
+	protected boolean test()
+	{
+		try
+		{
+			assert computeOne(getMapping("COM)B\r\nB)C\r\nC)D\r\nD)E\r\nE)F\r\nB)G\r\nG)H\r\nD)I\r\nE)J\r\nJ)K\r\nK)L")) == 42;
+		}
+		catch (AssertionError e)
+		{
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	protected void solvePartOne()
+	{
+		System.out.println(computeOne(nodes));
+	}
+
+	private int computeOne(Map<String, Node> nodes)
 	{
 		return nodes.values().stream()
 				.mapToInt(n -> getDistanceToRoot(n, 0))
 				.sum();
 	}
 
-	private static int solvePartTwo()
+	@Override
+	protected void solvePartTwo()
 	{
 		Node you = nodes.get("YOU");
 		Node san = nodes.get("SAN");
 
-		return minimalDistanceBetween(you.parent, san.parent);
+		System.out.println(minimalDistanceBetween(you.parent, san.parent));
 	}
 
-	private static int minimalDistanceBetween(Node start, Node end)
+	private int minimalDistanceBetween(Node start, Node end)
 	{
 		List<String> orderedFromStart = getOrderedParents(start);
 		List<String> orderedFromEnd = getOrderedParents(end);
@@ -72,7 +103,7 @@ public class Ac06
 		return min;
 	}
 
-	private static List<String> getOrderedParents(Node start)
+	private List<String> getOrderedParents(Node start)
 	{
 		List<String> result = new ArrayList<>();
 
@@ -87,7 +118,7 @@ public class Ac06
 		return result;
 	}
 
-	private static int getDistanceToRoot(Node node, int soFar)
+	private int getDistanceToRoot(Node node, int soFar)
 	{
 		if (node.parent == null)
 			return soFar;

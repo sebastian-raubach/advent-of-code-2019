@@ -62,4 +62,11 @@ public class TaskUtils
 				.mapToInt(Integer::parseInt)
 				.toArray();
 	}
+
+	public static long[] mapToLongs(String input, String separator)
+	{
+		return Arrays.stream(input.split(separator))
+				.mapToLong(Long::parseLong)
+				.toArray();
+	}
 }
