@@ -1,6 +1,6 @@
 public abstract class AbstractTask
 {
-	protected void run()
+	protected final void run()
 	{
 		if (test())
 		{
