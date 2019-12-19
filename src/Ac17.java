@@ -4,15 +4,13 @@ public class Ac17
 {
 	public static void main(String[] args) throws IOException
 	{
-//		solvePartOne();
-
+		solvePartOne();
 		solvePartTwo();
 	}
 
 	private static void solvePartTwo() throws IOException {
 		long[] input = TaskUtils.readAllLongs("res/input/17.txt", ",");
 
-//		String[] instructions = ["A,B,A,C,A,B,C,C,A,B\n", "R,8,L,10,R,8\n", "R,12,R,8,L,8,L,12\n", "L,12,L,10,L,8\n", "n"];
 		String instructions = "A,B,A,C,A,B,C,C,A,B\nR,8,L,10,R,8\nR,12,R,8,L,8,L,12\nL,12,L,10,L,8\nn\n";
 		char[] bits = instructions.toCharArray();
 		long[] longs = new long[bits.length];
