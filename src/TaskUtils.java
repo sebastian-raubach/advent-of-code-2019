@@ -69,4 +69,32 @@ public class TaskUtils
 				.mapToLong(Long::parseLong)
 				.toArray();
 	}
+
+	public static String toString(long[][] grid) {
+		StringBuilder builder = new StringBuilder();
+
+		for (int y = 0; y < grid.length; y++) {
+			for (int x = 0; x < grid[y].length; x++) {
+				builder.append(grid[y][x]);
+			}
+			builder.append('\n');
+		}
+		builder.append('\n');
+
+		return builder.toString();
+	}
+
+	public static String toString(char[][] grid) {
+		StringBuilder builder = new StringBuilder();
+
+		for (int y = 0; y < grid.length; y++) {
+			for (int x = 0; x < grid[y].length; x++) {
+				builder.append(grid[y][x]);
+			}
+			builder.append('\n');
+		}
+		builder.append('\n');
+
+		return builder.toString();
+	}
 }

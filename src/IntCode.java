@@ -1,16 +1,28 @@
+import java.util.Arrays;
+
 public class IntCode
 {
 	private long[] inputSequence;
 	private int operatorPosition = 0;
 	private int relativeBase = 0;
 	private int[] currentOperatorSequence;
+	private long[] globalManualInput;
+	private int globalManualInputPointer = 0;
 	private int increment;
 
-	public IntCode(long[] inputSequence)
+	public IntCode(long[] inputSequence, long[] globalManualInput)
 	{
 		// Copy the array onto a much larger array. This was necessary because some tasks needed more memory.
 		this.inputSequence = new long[inputSequence.length * 1000];
 		System.arraycopy(inputSequence, 0, this.inputSequence, 0, inputSequence.length);
+
+		if (globalManualInput != null)
+			this.globalManualInput = Arrays.copyOf(globalManualInput, globalManualInput.length);
+	}
+
+	public IntCode(long[] inputSequence)
+	{
+		this(inputSequence, null);
 	}
 
 	private static int[] instructionToParts(long input)
@@ -56,7 +68,10 @@ public class IntCode
 					increment = 4;
 					break;
 				case 3:
-					inputSequence[getAddress(1, currentOperatorSequence[2])] = manualInput[manualInputPointer++];
+					if (globalManualInput != null)
+						inputSequence[getAddress(1, currentOperatorSequence[2])] = globalManualInput[globalManualInputPointer++];
+					else
+						inputSequence[getAddress(1, currentOperatorSequence[2])] = manualInput[manualInputPointer++];
 					increment = 2;
 					break;
 				case 4:
