@@ -137,9 +137,8 @@ public class Ac18 extends AbstractTask
 			Collections.sort(sortedKeys);
 			String key = current.x + " " + current.y + " " + sortedKeys.toString();
 
-			if (visited.contains(key)) {
+			if (visited.contains(key))
 				continue;
-			}
 
 			visited.add(key);
 

@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class TaskUtils
@@ -56,6 +57,19 @@ public class TaskUtils
 				.toArray();
 	}
 
+	public static char[][] readGrid(String path) throws IOException
+	{
+		Path input = new File(path).toPath();
+
+		List<String> lines = Files.readAllLines(input);
+		char[][] result = new char[lines.size()][];
+
+		for (int i = 0; i < lines.size(); i++)
+			result[i] = lines.get(i).toCharArray();
+
+		return result;
+	}
+
 	public static int[] mapToInts(String input, String separator)
 	{
 		return Arrays.stream(input.split(separator))
@@ -70,11 +84,14 @@ public class TaskUtils
 				.toArray();
 	}
 
-	public static String toString(long[][] grid) {
+	public static String toString(long[][] grid)
+	{
 		StringBuilder builder = new StringBuilder();
 
-		for (int y = 0; y < grid.length; y++) {
-			for (int x = 0; x < grid[y].length; x++) {
+		for (int y = 0; y < grid.length; y++)
+		{
+			for (int x = 0; x < grid[y].length; x++)
+			{
 				builder.append(grid[y][x]);
 			}
 			builder.append('\n');
@@ -84,11 +101,34 @@ public class TaskUtils
 		return builder.toString();
 	}
 
-	public static String toString(char[][] grid) {
+	public static String toString(int[][] grid)
+	{
 		StringBuilder builder = new StringBuilder();
 
-		for (int y = 0; y < grid.length; y++) {
-			for (int x = 0; x < grid[y].length; x++) {
+		for (int y = 0; y < grid.length; y++)
+		{
+			for (int x = 0; x < grid[y].length; x++)
+			{
+				if (grid[y][x] == 0)
+					builder.append("#");
+				else
+					builder.append((char)('0' + grid[y][x]) + "");
+			}
+			builder.append('\n');
+		}
+		builder.append('\n');
+
+		return builder.toString();
+	}
+
+	public static String toString(char[][] grid)
+	{
+		StringBuilder builder = new StringBuilder();
+
+		for (int y = 0; y < grid.length; y++)
+		{
+			for (int x = 0; x < grid[y].length; x++)
+			{
 				builder.append(grid[y][x]);
 			}
 			builder.append('\n');
