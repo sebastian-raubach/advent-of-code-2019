@@ -1,4 +1,5 @@
-import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class IntCode
 {
@@ -6,18 +7,16 @@ public class IntCode
 	private int operatorPosition = 0;
 	private int relativeBase = 0;
 	private int[] currentOperatorSequence;
-	private long[] globalManualInput;
-	private int globalManualInputPointer = 0;
+	private Queue<Long> manualInput = new LinkedList<>();
 	private int increment;
 
-	public IntCode(long[] inputSequence, long[] globalManualInput)
+	public IntCode(long[] inputSequence, long... globalManualInput)
 	{
 		// Copy the array onto a much larger array. This was necessary because some tasks needed more memory.
 		this.inputSequence = new long[inputSequence.length * 1000];
 		System.arraycopy(inputSequence, 0, this.inputSequence, 0, inputSequence.length);
 
-		if (globalManualInput != null)
-			this.globalManualInput = Arrays.copyOf(globalManualInput, globalManualInput.length);
+		addManualInput(globalManualInput);
 	}
 
 	public IntCode(long[] inputSequence)
@@ -43,9 +42,20 @@ public class IntCode
 		return inputSequence[operatorPosition] != 99;
 	}
 
+	public void addManualInput(long... manualInput)
+	{
+		if (manualInput != null)
+		{
+			for (int i = 0; i < manualInput.length; i++)
+			{
+				this.manualInput.add(manualInput[i]);
+			}
+		}
+	}
+
 	public long computeOutput(long... manualInput)
 	{
-		int manualInputPointer = 0;
+		addManualInput(manualInput);
 
 		loop:
 		while (true)
@@ -68,11 +78,15 @@ public class IntCode
 					increment = 4;
 					break;
 				case 3:
-					if (globalManualInput != null)
-						inputSequence[getAddress(1, currentOperatorSequence[2])] = globalManualInput[globalManualInputPointer++];
+					if (this.manualInput.size() < 1)
+					{
+						return -Integer.MAX_VALUE;
+					}
 					else
-						inputSequence[getAddress(1, currentOperatorSequence[2])] = manualInput[manualInputPointer++];
-					increment = 2;
+					{
+						inputSequence[getAddress(1, currentOperatorSequence[2])] = this.manualInput.poll();
+						increment = 2;
+					}
 					break;
 				case 4:
 					int index = getIndex(1, currentOperatorSequence[2]);
